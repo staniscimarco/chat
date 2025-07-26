@@ -1,5 +1,4 @@
 import { PDFDocument } from 'pdf-lib';
-import { createCanvas } from 'canvas';
 import * as math from 'mathjs';
 import { ocrImageBuffer } from './utils';
 import * as fs from 'fs';
