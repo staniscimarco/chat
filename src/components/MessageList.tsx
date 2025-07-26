@@ -2,8 +2,6 @@ import { cn } from "@/lib/utils";
 import { Message } from "ai/react";
 import { Loader2, User, Bot } from "lucide-react";
 import React, { useState } from "react";
-import Lightbox from "react-image-lightbox";
-import "react-image-lightbox/style.css";
 import ImageTableDisplay from "./ImageTableDisplay";
 
 type Props = {
@@ -366,14 +364,37 @@ const MessageList = ({ messages, isLoading, onNavigateToPdfPage }: Props) => {
                         </div>
                       ))}
                       {lightboxOpen && (
-                        <Lightbox
-                          mainSrc={lightboxImages[lightboxIndex]}
-                          nextSrc={lightboxImages[(lightboxIndex + 1) % lightboxImages.length]}
-                          prevSrc={lightboxImages[(lightboxIndex + lightboxImages.length - 1) % lightboxImages.length]}
-                          onCloseRequest={() => setLightboxOpen(false)}
-                          onMovePrevRequest={() => setLightboxIndex((lightboxIndex + lightboxImages.length - 1) % lightboxImages.length)}
-                          onMoveNextRequest={() => setLightboxIndex((lightboxIndex + 1) % lightboxImages.length)}
-                        />
+                        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                          <div className="relative max-w-4xl max-h-full">
+                            <button
+                              onClick={() => setLightboxOpen(false)}
+                              className="absolute top-4 right-4 text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-75"
+                            >
+                              ×
+                            </button>
+                            <img
+                              src={lightboxImages[lightboxIndex]}
+                              alt="Lightbox"
+                              className="max-w-full max-h-full object-contain"
+                            />
+                            {lightboxImages.length > 1 && (
+                              <div className="absolute inset-0 flex items-center justify-between p-4">
+                                <button
+                                  onClick={() => setLightboxIndex((lightboxIndex + lightboxImages.length - 1) % lightboxImages.length)}
+                                  className="text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-75"
+                                >
+                                  ‹
+                                </button>
+                                <button
+                                  onClick={() => setLightboxIndex((lightboxIndex + 1) % lightboxImages.length)}
+                                  className="text-white text-2xl bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-75"
+                                >
+                                  ›
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       )}
                     </div>
                   )}
