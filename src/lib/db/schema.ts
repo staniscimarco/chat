@@ -1,48 +1,47 @@
-import {
-  integer,
-  pgEnum,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-  varchar,
-} from "drizzle-orm/pg-core";
-
-export const userSystemEnum = pgEnum("user_system_enum", ["system", "user"]);
+import { pgTable, text, timestamp, integer, boolean } from "drizzle-orm/pg-core";
 
 export const chats = pgTable("chats", {
-  id: serial("id").primaryKey(),
+  id: text("id").primaryKey(),
   pdfName: text("pdf_name").notNull(),
   pdfUrl: text("pdf_url").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  userId: varchar("user_id", { length: 256 }).notNull(),
   fileKey: text("file_key").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  userId: text("user_id").notNull(), // Add user ID reference
 });
-
-export type DrizzleChat = typeof chats.$inferSelect;
 
 export const messages = pgTable("messages", {
-  id: serial("id").primaryKey(),
-  chatId: integer("chat_id")
-    .references(() => chats.id)
-    .notNull(),
-  content: text("content").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  role: userSystemEnum("role").notNull(),
-});
-
-export const userSubscriptions = pgTable("user_subscriptions", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id", { length: 256 }).notNull().unique(),
-  stripeCustomerId: varchar("stripe_customer_id", { length: 256 })
+  id: text("id").primaryKey(),
+  chatId: text("chat_id")
     .notNull()
-    .unique(),
-  stripeSubscriptionId: varchar("stripe_subscription_id", {
-    length: 256,
-  }).unique(),
-  stripePriceId: varchar("stripe_price_id", { length: 256 }),
-  stripeCurrentPeriodEnd: timestamp("stripe_current_period_ended_at"),
+    .references(() => chats.id, { onDelete: "cascade" }),
+  role: text("role", { enum: ["user", "assistant"] }).notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-// drizzle-orm
-// drizzle-kit
+// User authentication tables
+export const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  isAdmin: boolean("is_admin").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const sessions = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Type definitions for TypeScript
+export type DrizzleChat = typeof chats.$inferSelect;
+export type DrizzleMessage = typeof messages.$inferSelect;
+export type DrizzleUser = typeof users.$inferSelect;
+export type DrizzleSession = typeof sessions.$inferSelect;

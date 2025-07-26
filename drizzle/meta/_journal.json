@@ -1,0 +1,34 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1753010722158,
+      "tag": "0000_magical_daredevil",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1753012838991,
+      "tag": "0001_romantic_baron_strucker",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1753013562230,
+      "tag": "0002_parallel_agent_zero",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1753019806867,
+      "tag": "0003_sharp_legion",
+      "breakpoints": true
+    }
+  ]
+}

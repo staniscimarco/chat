@@ -1,14 +1,14 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
+// import { ClerkProvider } from "@clerk/nextjs";
 import Providers from "@/components/Providers";
-import { Toaster } from "react-hot-toast";
+import Toaster from "@/components/Toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ChatPDF YT",
+  title: "DOCKY-AI",
 };
 
 export default function RootLayout({
@@ -17,13 +17,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    // <ClerkProvider>
       <Providers>
-        <html lang="en">
-          <body className={inter.className}>{children}</body>
-          <Toaster />
+        <html lang="en" className="h-full">
+          <body className={`${inter.className} h-full m-0 p-0`}>
+            {children}
+            <Toaster />
+          </body>
         </html>
       </Providers>
-    </ClerkProvider>
+    // </ClerkProvider>
   );
 }
