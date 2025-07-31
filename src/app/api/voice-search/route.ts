@@ -215,112 +215,6 @@ export async function POST(req: Request) {
     console.log("📄 Context length:", context.length);
     console.log("📄 Page numbers:", pageNumbers);
     
-    // Stesso prompt della chat PDF
-    const prompt = {
-      role: "system" as const,
-      content: `Sei un assistente AI avanzato specializzato nell'analisi approfondita di documenti PDF accademici e tecnici. Il tuo compito è fornire risposte dettagliate e precise basandoti esclusivamente sul contenuto fornito nel contesto.
-
-      CONTESTO DEL DOCUMENTO:
-      ${context}
-      
-
-      ISTRUZIONI AVANZATE:
-      1. Rispondi SEMPRE in italiano con un linguaggio tecnico appropriato
-      2. Analizza il contesto in modo approfondito per estrarre informazioni specifiche
-      3. Per domande sui capitoli, cerca sistematicamente:
-         - Numeri di capitolo espliciti (1, 2, 3, 4, 5, ecc.)
-         - Titoli di capitolo completi
-         - Sezioni e sottosezioni correlate
-         - Argomenti principali di ogni capitolo
-         - Autori e collaboratori menzionati
-         - Date di pubblicazione o riferimenti temporali
-         - Metodologie e approcci descritti
-         - Risultati e conclusioni presentati
-      4. Per domande sugli autori, cerca:
-         - Nomi completi degli autori
-         - Affiliazioni istituzionali
-         - Ruoli e contributi specifici
-         - Credenziali accademiche
-         - Collaborazioni menzionate
-      5. Sii estremamente dettagliato e fornisci:
-         - Citazioni dirette dal testo quando appropriato
-         - Riferimenti specifici a sezioni del documento
-         - Spiegazioni tecniche accurate
-         - Collegamenti tra diversi argomenti
-         - Analisi critica quando richiesto
-      6. IMPORTANTE: Fornisci una risposta completa e dettagliata basata sul contenuto dei documenti, senza aggiungere riferimenti tecnici alla fine.
-
-      STRATEGIA DI RICERCA AVANZATA:
-      - Cerca pattern come "Capitolo X", "X. Introduzione", "X. Metodologia"
-      - Identifica autori con pattern come "Autore: Nome", "di Nome Cognome", "N. Cognome"
-      - Cerca riferimenti bibliografici e citazioni
-      - Analizza la struttura logica del documento
-      - Identifica parole chiave tecniche e concetti principali
-      - Cerca definizioni, teoremi, algoritmi, metodologie
-      - Identifica risultati sperimentali, grafici, tabelle
-
-      TIPI DI RISPOSTE RICHIESTE:
-      - Per capitoli: Struttura, contenuti principali, obiettivi, risultati
-      - Per autori: Nome completo, affiliazione, contributi, background
-      - Per metodologie: Descrizione dettagliata, vantaggi, limitazioni
-      - Per risultati: Dati specifici, interpretazioni, implicazioni
-      - Per conclusioni: Sintesi, significato, prospettive future
-
-      ALGORITMO INTELLIGENTE PER ANALISI DEL CONTENUTO:
-      
-      FASE 1 - ANALISI DEL CONTENUTO:
-      - Leggi attentamente ogni riga del contesto fornito
-      - Identifica titoli, sottotitoli, sezioni e contenuti specifici
-      - Cerca pattern strutturali del documento
-      
-      FASE 2 - IDENTIFICAZIONE DELL'INFORMAZIONE RICHIESTA:
-      - Se la domanda riguarda "tabella", "grafico", "figura", "diagramma":
-        * Cerca titoli come "Tabella di Sintesi e Analisi", "Tabella", "Grafico", "Figura"
-        * Cerca dati numerici specifici (2021, 2022, 2023, 2024)
-        * Cerca valori di produzione (100, 150, 130, 170 tonnellate)
-        * Cerca valori di consumo (2000, 2200, 2100, 2500 kWh)
-        * Cerca strutture tabellari (righe con |, intestazioni, dati)
-      
-      FASE 3 - ANALISI DEL CONTENUTO:
-      - Per ogni informazione trovata, analizza il contenuto specifico
-      - Se vedi dati specifici (es. "2021: 100 tonnellate, 2000 kWh"), includili nella risposta
-      - Se vedi un titolo "Tabella di Sintesi e Analisi", descrivi la tabella
-      - Se vedi una struttura tabellare completa, analizzala dettagliatamente
-      
-      FASE 4 - VALIDAZIONE:
-      - Verifica che l'informazione sia completa e coerente
-      - Assicurati che il contenuto sia pertinente alla domanda
-      
-      FASE 5 - RISPOSTA PRECISA:
-      - Fornisci la risposta basata sul contenuto identificato
-      - Sii dettagliato e specifico nelle informazioni fornite
-
-      ESEMPI DI ANALISI CORRETTA:
-      
-      ESEMPIO 1 - TABELLA:
-      Domanda: "mostrami la tabella"
-      Analisi: 
-      - Cerca "Tabella di Sintesi e Analisi" nel contesto
-      - Cerca dati numerici (2021, 2022, 2023, 2024)
-      - Cerca valori specifici (100, 150, 130, 170 tonnellate)
-      - Fornisci la risposta basata sul contenuto trovato
-      
-      ESEMPIO 2 - GRAFICO:
-      Domanda: "mostrami il grafico"
-      Analisi:
-      - Cerca "Grafico", "Figura", "Diagramma" nel contesto
-      - Cerca descrizioni di visualizzazioni
-      - Fornisci la risposta basata sul contenuto trovato
-      
-      ESEMPIO 3 - CONCLUSIONI:
-      Domanda: "conclusioni"
-      Analisi:
-      - Cerca "Conclusioni", "Conclusioni finali", "Sintesi" nel contesto
-      - Fornisci la risposta basata sul contenuto trovato
-
-      IMPORTANTE: Se non trovi informazioni sufficienti nel contesto fornito, rispondi onestamente che non hai trovato informazioni pertinenti nei documenti disponibili.`
-    };
-    
     // Check if context is empty or too short
     if (!context || context.trim().length < 30) {
       console.log("⚠️ Context is empty or too short");
@@ -329,7 +223,29 @@ export async function POST(req: Request) {
         sources: []
       });
     }
+
+    // Truncate context to fit OpenAI's token limit (approximately 10,000 tokens)
+    // Rough estimation: 1 token ≈ 4 characters
+    const maxContextLength = 10000 * 4; // ~40,000 characters
+    let truncatedContext = context;
     
+    if (context.length > maxContextLength) {
+      console.log(`⚠️ Context too long (${context.length} chars), truncating to ${maxContextLength} chars`);
+      truncatedContext = context.substring(0, maxContextLength);
+      console.log(`📏 Context truncated from ${context.length} to ${truncatedContext.length} characters`);
+    }
+    
+    // Prompt semplificato per voice search
+    const prompt = {
+      role: "system" as const,
+      content: `Sei un assistente AI che risponde in italiano. Rispondi basandoti esclusivamente su questo contenuto:
+
+${truncatedContext}
+
+Se non trovi informazioni pertinenti, dillo onestamente.`
+    };
+    
+    console.log("🤖 Invio richiesta a OpenAI...");
     const response = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [
@@ -343,8 +259,15 @@ export async function POST(req: Request) {
       max_tokens: 1000,
     });
     
+    console.log("🤖 OpenAI response status:", response.status);
+    console.log("🤖 OpenAI response ok:", response.ok);
+    
     const responseData = await response.json();
-    const result = responseData.choices[0]?.message?.content || "Non ho trovato una risposta appropriata.";
+    console.log("🔍 OpenAI response data:", JSON.stringify(responseData, null, 2));
+    console.log("🔍 Choices array:", responseData.choices);
+    console.log("🔍 First choice:", responseData.choices?.[0]);
+    
+    const result = responseData.choices?.[0]?.message?.content || "Non ho trovato una risposta appropriata.";
     
     console.log("🎯 Risposta generata:", result);
     console.log("📚 Fonti utilizzate:", sources.length);
