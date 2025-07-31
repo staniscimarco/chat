@@ -335,6 +335,7 @@ const DockyPage: React.FC = () => {
     try {
       console.log('🔍 Query vocale:', query);
       console.log('🌍 URL API:', window.location.origin + '/api/voice-search');
+      console.log('📤 Request body:', JSON.stringify({ query }));
       
       // Chiamata API per cercare in tutti i PDF
       const response = await fetch('/api/voice-search', {
@@ -357,6 +358,7 @@ const DockyPage: React.FC = () => {
       console.log('🎯 Risposta vocale:', data);
       console.log('📄 Contenuto risposta:', data.answer);
       console.log('📚 Fonti:', data.sources);
+      console.log('✅ Voice search completato con successo nel frontend');
       
       // Rimuovi il messaggio di processing
       setMessages(prev => prev.filter(msg => msg.content !== '🔍 DOCKY sta cercando nei tuoi documenti...'));

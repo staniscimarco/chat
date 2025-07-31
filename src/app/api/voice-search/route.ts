@@ -189,7 +189,10 @@ async function searchAllPDFs(query: string, userId: string) {
 
 export async function POST(req: Request) {
   try {
+    console.log("🎤 Voice search API chiamata");
+    
     const { currentUser } = await auth();
+    console.log("🔐 Auth result:", { currentUser: currentUser ? { id: currentUser.id, email: currentUser.email } : null });
     
     if (!currentUser?.email) {
       console.log("❌ Utente non autenticato");
@@ -204,6 +207,7 @@ export async function POST(req: Request) {
     }
     
     console.log("🎤 Voice search query:", query);
+    console.log("👤 User ID:", currentUser.id);
     
     // Cerca in tutti i PDF dell'utente
     const { context, pageNumbers, sources } = await searchAllPDFs(query, currentUser.id);
@@ -344,6 +348,7 @@ export async function POST(req: Request) {
     
     console.log("🎯 Risposta generata:", result);
     console.log("📚 Fonti utilizzate:", sources.length);
+    console.log("✅ Voice search completato con successo");
     
     return NextResponse.json({
       answer: result,
