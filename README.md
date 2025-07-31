@@ -221,5 +221,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Built with ❤️ using modern web technologies**
 
 *Transform your document workflow with AI-powered intelligence*
-
-
